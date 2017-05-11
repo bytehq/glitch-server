@@ -1,0 +1,123 @@
+<iml version="0.1">
+    <head>
+        <title>Example Interspace World</title>
+        <geometry>
+            orientationX: -1
+        </geometry>
+        <physics>
+            gravity: 9.8
+        </physics>
+        <terrain type="blocks" terraform="terraform.tml">
+            seed: 20000
+            turbulence: 240
+            landBias: 0
+            shoreBias: 0.15
+            seaLevel: 85
+            scale: 85
+        </terrain>
+        <weather>
+            cloudCount: 20
+            cloudSize: 100
+            cloudSpeed: 1.2
+        </weather>
+    </head>
+    <body>
+        <!-- include some scripts -->
+        <script src="tv.js" />
+        <script src="elevate.js" />
+
+        <!-- the default home point -->
+        <home x="-96" y="92" z="-14" rotation="49" />
+
+        <!-- The courtyard is "sticky" so you can ride it when you click the "Elevate" button -->
+        <sticky>
+            <mesh id="courtyard" src="courtyard.obj" textureSrc="courtyard.png" x="-86" y="86" z="35" width="32" height="32" depth="32" rotation="90" />
+        </sticky>
+
+        <!--
+          You could apply onclick directly to the sign, but wrapping with <a>
+          lets you specify the "title" that shows up when you aim at it
+          -->
+        <a title="Elevate!" onclick="Elevate();">
+            <sign x="-78.5" y="89" z="42.5" rotation="225">
+                <text bgcolor="#004FC2" color="#07EFC4">Elevate</text>
+            </sign>
+        </a>
+        <a title="Lower!" onclick="Lower();">
+            <sign x="-78.5" y="112" z="42.5" rotation="225">
+                <text bgcolor="#004FC2" color="#07EFC4">Lower</text>
+            </sign>
+        </a>
+
+        <!-- This TV plays animated GIFs. Check out tv.js for how the channel-changer works -->
+        <mesh src="tv.obj" x="-66" y="107" z="64" width="24" height="26" depth="26" rotation="-60" rotationX="20" rotationZ="30" orientationX="1" id="tv">
+            <img src="tv.png" />
+            <img src="giphy.gif" />
+        </mesh>
+        <a title="Change the channel" onclick="RotateTvChannel();">
+            <sign x="-78.5" y="88" z="42.5" rotation="225" id="tv-remote">
+                <text bgcolor="#004FC2" color="#07EFC4">TV Remote</text>
+            </sign>
+        </a>
+
+        <!-- They key to someone's heart. You can pick it up! -->
+        <rigidbody id="key" pickup="true" stabilized="true" networked="true">
+            <mesh src="key.obj" x="-93" y="86" z="-3" width="2" height="2" depth="2" />
+        </rigidbody>
+
+        <!--
+        This boat has the "floating" behavior attached to it,
+        which makes it looks like it's actually on the water.
+        We pass the argument `speed` with value 0.05 here.
+        -->
+        <mesh src="boat.obj"
+            textureSrc="boat-head.png, boat-eye.png, boat-body.png"
+            x="-60" y="86" z="36"
+            width="6" height="6" depth="6" rotation="210"
+            behavior="floating.js (speed: 0.05)"
+            />
+
+        <!--
+        This stand-alone link uses the default "portal" rendering. It teleports you to the
+        HomePoint (specified just below) with the ID "arch."
+        -->
+        <a href="#arch" title="Top of the Arch" x="-64" y="87" z="-18" id="arch-link" />
+        <mesh src="arc.obj" textureSrc="arc.png" x="-64" y="86" z="-20" width="24" height="26" depth="26" rotation="180" />
+        <home id="arch" x="-63" y="99" z="-18" rotation="177" />
+
+        <mesh src="gems.obj" textureSrc="grad.png" x="-46" y="86" z="-9" width="14" height="14" depth="14" rotation="-27" />
+
+        <mesh src="island.obj" textureSrc="island.png" x="-103" y="92" z="-33" width="14" height="14" depth="14" rotation="-50" />
+        <mesh src="pillar.obj" textureSrc="pillar.png" x="-40" y="85" z="28" width="30" height="30" depth="30" rotation="45" />
+        <mesh src="grassTowers.obj" textureSrc="grassTowers.png" x="-5" y="85" z="35" width="100" height="100" depth="100" rotation="45" />
+
+        <mesh src="n64.obj" textureSrc="n64.png" x="-137" y="85" z="-26" width="12" height="12" depth="12" rotation="-45" />
+
+        <!--
+        The treehouse has a few basketballs laying around. Like the key, they can be picked up
+        and thrown around, and because they are "networked," everyone nearby can watch as you
+        make that game-winning basket!
+        -->
+        <mesh src="treehouse.obj" textureSrc="treehouse.png" x="-131" y="96" z="4" width="60" height="60" depth="60" rotation="90" />
+        <rigidbody id="bb1" pickup="true" stabilized="true" networked="true">
+            <mesh src="basketball.obj" x="-134" y="135" z="5" width="0.6" height="0.6" depth="0.6" />
+        </rigidbody>
+
+        <rigidbody id="bb2" pickup="true" stabilized="true" networked="true">
+            <mesh src="basketball.obj" x="-134.5" y="135" z="5.5" width="0.6" height="0.6" depth="0.6" />
+        </rigidbody>
+
+        <rigidbody id="bb3" pickup="true" stabilized="true" networked="true">
+            <mesh src="basketball.obj" x="-133.5" y="135" z="5.5" width="0.6" height="0.6" depth="0.6" />
+        </rigidbody>
+
+        <!--
+        Step inside panoramic media! We support images as here, as well
+        as ogv video. It looks like this:
+            <video src="video.ogv" thumbnailSrc="video-thumb.jpg" />
+        -->
+        <pano title="Canal" x="-105" y="89" z="-9">
+            <img src="canal_test.jpg" />
+        </pano>
+    </body>
+</iml>
