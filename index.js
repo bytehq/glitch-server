@@ -80,7 +80,7 @@ server.get(/.*/, function(req, res, next) {
             'max-Age': 604800 // 1 week
         });
 
-        if (path.extname(room) !== '.iml' && path.extname(room) !== '.js') {
+        if (['.iml', '.xml', '.js'].indexOf(path.extname(room)) < 0) {
             let target = cdnDirectory.replace('https://', 'http://') + room;
             res.redirect(target, next);
         } else {
@@ -98,38 +98,50 @@ server.get(/.*/, function(req, res, next) {
     });
 
     // Serve static files without X-Interspace headers
-    if (path.extname(room) !== '.iml' && path.extname(room) !== '.js') {
+    if (['.iml', '.xml', '.js'].indexOf(path.extname(room)) < 0) {
         let target = cdnDirectory.replace('https://', 'http://') + room;
         res.redirect(target, next);
         return;
     }
 
-    if (path.extname(room) !== '.iml') {
+    if (['.iml', '.xml'].indexOf(path.extname(room)) < 0) {
         console.log('Serving: ' + room);
         cb(req, res, next);
         return;
+    } else {
+        fs.access(path.join(publicDir, room), function(err) {
+            if (err && err.code === 'ENOENT') {
+                let target = req.url.replace('.iml', '.xml');
+                res.redirect(target, next);
+                return;
+            } else {
+                getCOPRServer();
+            }
+        });
     }
 
-    // Fetch COPR headers from COPR Manager and return
-    interspaceServer.getCOPRServer(room, function(err, response) {
-        if (err !== null) {
-            console.error('COPR Header request failed: ' + err);
-            return;
-        }
-        interspaceServer.initialiseWorldState(room, function(err) {
+    function getCOPRServer() {
+        // Fetch COPR headers from COPR Manager and return
+        interspaceServer.getCOPRServer(room, function(err, response) {
             if (err !== null) {
-                console.error('Initialising world state failed:' + err);
+                console.error('COPR Header request failed: ' + err);
                 return;
             }
+            interspaceServer.initialiseWorldState(room, function(err) {
+                if (err !== null) {
+                    console.error('Initialising world state failed:' + err);
+                    return;
+                }
 
-            // Set X-Interspace headers
-            res.header('X-Interspace-COPR-Room', room);
-            res.header('X-Interspace-COPR-Address', response.coprAddress);
-            res.header('X-Interspace-COPR-UUID', response.uuid);
+                // Set X-Interspace headers
+                res.header('X-Interspace-COPR-Room', room);
+                res.header('X-Interspace-COPR-Address', response.coprAddress);
+                res.header('X-Interspace-COPR-UUID', response.uuid);
 
-            cb(req, res, next);
+                cb(req, res, next);
+            });
         });
-    });
+    }
 });
 
 /*
